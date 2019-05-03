@@ -25,6 +25,7 @@
 
 #import <GLKit/GLKit.h>
 #include "GLDebugDrawer.h"
+#import <OpenGLES/ES2/glext.h>
 
 GLDebugDrawer::GLDebugDrawer():m_debugMode(0)
 {
@@ -101,7 +102,7 @@ void    GLDebugDrawer::drawContactPoint(const btVector3& pointOnB,const btVector
 {
     btVector3 to=pointOnB+normalOnB*distance;
     const btVector3&from = pointOnB;
-    glColor4f(color.getX(), color.getY(), color.getZ(), 1.0f);   
+    //glColor4f(color.getX(), color.getY(), color.getZ(), 1.0f);   
     
     GLDebugDrawer::drawLine(from, to, color);
 }

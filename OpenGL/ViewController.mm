@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #include "btBulletDynamicsCommon.h"
 #import "GLDebugDrawer.h"
+#import <OpenGLES/ES2/glext.h>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -474,6 +475,7 @@ static NSString *borderType = @"borderType";
     CGPoint location = [touch locationInView: touch.view];
     CGPoint lastLocation = [touch previousLocationInView: touch.view];
     CGPoint diff = CGPointMake(lastLocation.x - location.x, lastLocation.y - location.y);
+
     
     float rotX = -1 * GLKMathDegreesToRadians(diff.y);
     float rotY = -1 * GLKMathDegreesToRadians(diff.x);
@@ -484,13 +486,28 @@ static NSString *borderType = @"borderType";
                                              rm.m31, rm.m32, rm.m33, 0,
                                              0,      0,      0,      1);
     bool isInverible;
-    GLKVector3 xAxis = GLKMatrix4MultiplyVector3(deviceMatrix, GLKVector3Make(1, 0, 0));
-    xAxis = GLKMatrix4MultiplyVector3(GLKMatrix4Invert(_rotationMatrix, &isInverible), xAxis);
-    _rotationMatrix = GLKMatrix4Rotate(_rotationMatrix, rotX, xAxis.x, xAxis.y, xAxis.z);
+    if (rotX != 0) {
+        GLKVector3 xAxis = GLKMatrix4MultiplyVector3(deviceMatrix, GLKVector3Make(1, 0, 0));
+        xAxis = GLKMatrix4MultiplyVector3(GLKMatrix4Invert(_rotationMatrix, &isInverible), xAxis);
+        _rotationMatrix = GLKMatrix4Rotate(_rotationMatrix, rotX, xAxis.x, xAxis.y, xAxis.z);
+    }
+    for (int i = 0; i < 16; i++) {
+        if ([[NSString stringWithFormat:@"%f", _rotationMatrix.m[i]] isEqualToString:@"nan"]) {
+            NSLog(@"ppc");
+        }
+    }
+    
+    if (rotY != 0) {
+        GLKVector3 yAxis = GLKMatrix4MultiplyVector3(deviceMatrix, GLKVector3Make(0, 1, 0));
+        yAxis = GLKMatrix4MultiplyVector3(GLKMatrix4Invert(_rotationMatrix, &isInverible), yAxis);
+        _rotationMatrix = GLKMatrix4Rotate(_rotationMatrix, rotY, yAxis.x, yAxis.y, yAxis.z);
+    }
 
-    GLKVector3 yAxis = GLKMatrix4MultiplyVector3(deviceMatrix, GLKVector3Make(0, 1, 0));
-    yAxis = GLKMatrix4MultiplyVector3(GLKMatrix4Invert(_rotationMatrix, &isInverible), yAxis);
-    _rotationMatrix = GLKMatrix4Rotate(_rotationMatrix, rotY, yAxis.x, yAxis.y, yAxis.z);
+    for (int i = 0; i < 16; i++) {
+        if ([[NSString stringWithFormat:@"%f", _rotationMatrix.m[i]] isEqualToString:@"nan"]) {
+            NSLog(@"ppc");
+        }
+    }
 }
 
 #pragma mark - pinch 
